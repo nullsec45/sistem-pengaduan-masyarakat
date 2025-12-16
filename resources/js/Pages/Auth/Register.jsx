@@ -1,17 +1,24 @@
 import { useEffect } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+// Import komponen UI (Pastikan path sesuai struktur project Anda)
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
 export default function Register() {
+    // 1. Setup State Inertia
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
+        // Jika Anda perlu username & phone_number sesuai schema sebelumnya, tambahkan disini:
+        // username: '',
+        // phone_number: '',
     });
 
     useEffect(() => {
@@ -20,9 +27,9 @@ export default function Register() {
         };
     }, []);
 
+    // 2. Handle Submit
     const submit = (e) => {
         e.preventDefault();
-
         post(route('register'));
     };
 
@@ -30,88 +37,93 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
+            <div className="flex items-center justify-center py-12">
+                <Card className="mx-auto max-w-sm w-full">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-headline">Register</CardTitle>
+                        <CardDescription>
+                            Buat akun baru untuk mulai melaporkan aspirasi Anda.
+                        </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent>
+                        <form onSubmit={submit}>
+                            <div className="grid gap-4">
+                                
+                                {/* Nama Lengkap */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="name">Nama Lengkap</Label>
+                                    <Input 
+                                        id="name" 
+                                        placeholder="John Doe" 
+                                        value={data.name}
+                                        onChange={(e) => setData('name', e.target.value)}
+                                        required 
+                                        autoFocus
+                                        autoComplete="name"
+                                    />
+                                    <InputError message={errors.name} />
+                                </div>
 
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                    />
+                                {/* Email */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="m@example.com"
+                                        value={data.email}
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        required
+                                        autoComplete="username"
+                                    />
+                                    <InputError message={errors.email} />
+                                </div>
 
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
+                                {/* Password */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input 
+                                        id="password" 
+                                        type="password" 
+                                        value={data.password}
+                                        onChange={(e) => setData('password', e.target.value)}
+                                        required 
+                                        autoComplete="new-password"
+                                    />
+                                    <InputError message={errors.password} />
+                                </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
+                                {/* Konfirmasi Password (Wajib untuk Laravel Default) */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password_confirmation">Konfirmasi Password</Label>
+                                    <Input 
+                                        id="password_confirmation" 
+                                        type="password" 
+                                        value={data.password_confirmation}
+                                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                                        required 
+                                        autoComplete="new-password"
+                                    />
+                                    <InputError message={errors.password_confirmation} />
+                                </div>
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                    />
+                                {/* Tombol Submit */}
+                                <Button type="submit" className="w-full" disabled={processing}>
+                                    {processing ? 'Memproses...' : 'Buat Akun'}
+                                </Button>
+                            </div>
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password_confirmation} className="mt-2" />
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    <Link
-                        href={route('login')}
-                        className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
-                </div>
-            </form>
+                            <div className="mt-4 text-center text-sm">
+                                Sudah punya akun?{' '}
+                                <Link href={route('login')} className="underline">
+                                    Login
+                                </Link>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
         </GuestLayout>
     );
 }

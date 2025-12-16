@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
-import Checkbox from '@/Components/Checkbox';
 import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import InputError from '@/Components/InputError'; // Komponen bawaan Breeze untuk error
 import { Head, Link, useForm } from '@inertiajs/react';
 
+// Pastikan import ini sesuai dengan lokasi komponen UI Anda (misal: Shadcn UI)
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
 export default function Login({ status, canResetPassword }) {
+    // 1. Setup State & Form Helper dari Inertia
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -20,9 +23,9 @@ export default function Login({ status, canResetPassword }) {
         };
     }, []);
 
+    // 2. Handle 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('login'));
     };
 
@@ -30,68 +33,87 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head title="Log in" />
 
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
-
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
+            {/* Menampilkan status flash message jika ada (misal: "Password berhasil direset") */}
+            {status && (
+                <div className="mb-4 font-medium text-sm text-green-600 text-center">
+                    {status}
                 </div>
+            )}
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+            <div className="flex items-center justify-center py-12">
+                <Card className="mx-auto max-w-sm w-full">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-headline">Login</CardTitle>
+                        <CardDescription>
+                            Masukkan email Anda di bawah ini untuk login ke akun Anda
+                        </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent>
+                        <form onSubmit={submit}>
+                            <div className="grid gap-4">
+                                
+                                {/* Input Email */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        placeholder="m@example.com"
+                                        value={data.email}
+                                        autoComplete="username"
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        required
+                                    />
+                                    {/* Menampilkan Error Email */}
+                                    <InputError message={errors.email} className="mt-0" />
+                                </div>
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
+                                {/* Input Password */}
+                                <div className="grid gap-2">
+                                    <div className="flex items-center">
+                                        <Label htmlFor="password">Password</Label>
+                                        
+                                        {canResetPassword && (
+                                            <Link
+                                                href={route('password.request')}
+                                                className="ml-auto inline-block text-sm underline"
+                                            >
+                                                Lupa password?
+                                            </Link>
+                                        )}
+                                    </div>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        value={data.password}
+                                        autoComplete="current-password"
+                                        onChange={(e) => setData('password', e.target.value)}
+                                        required
+                                    />
+                                    {/* Menampilkan Error Password */}
+                                    <InputError message={errors.password} className="mt-0" />
+                                </div>
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
+                                {/* Tombol Login */}
+                                <Button type="submit" className="w-full" disabled={processing}>
+                                    {processing ? 'Logging in...' : 'Login'}
+                                </Button>
+                            </div>
 
-                <div className="block mt-4">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) => setData('remember', e.target.checked)}
-                        />
-                        <span className="ms-2 text-sm text-gray-600">Remember me</span>
-                    </label>
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
-                </div>
-            </form>
+                            {/* Link Register */}
+                            <div className="mt-4 text-center text-sm">
+                                Belum punya akun?{' '}
+                                <Link href={route('register')} className="underline">
+                                    Register
+                                </Link>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
         </GuestLayout>
     );
 }
