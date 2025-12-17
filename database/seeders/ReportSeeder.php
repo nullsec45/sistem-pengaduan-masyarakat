@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Reporter;
+use App\Models\Report;
+
 
 class ReportSeeder extends Seeder
 {
@@ -12,6 +14,12 @@ class ReportSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $reporters = Reporter::all();
+
+        foreach ($reporters as $reporter) {
+            Report::factory(rand(1, 3))->create([
+                'reporter_id' => $reporter->id,
+            ]);
+        }
     }
 }

@@ -19,10 +19,14 @@ class ReportFactory extends Factory
      */
     public function definition(): array
     {
+        $category = Category::inRandomOrder()->first();
+        $prefix = $category ? strtoupper(substr($category->name, 0, 3)) : 'GEN';
+
         return [
             'reporter_id' => Reporter::inRandomOrder()->first()->id,
             'category_id' => Category::inRandomOrder()->first()->id,
-            'ticket_id' => 'TICKET-' . strtoupper(Str::random(8)),
+            'ticket_id' =>   $prefix . '-' . strtoupper(Str::random(8)),
+            'title'       => fake()->sentence(),
             'description' => fake()->paragraph(3),
             'status' => fake()->randomElement(['Pending', 'Proses Administratif', 'Proses Penanganan', 'Selesai Ditangani', 'Laporan Ditolak']),
         ];
