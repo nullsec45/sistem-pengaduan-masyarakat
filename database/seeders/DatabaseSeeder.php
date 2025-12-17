@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
 
                 ReporterSeeder::class,
                 ReportSeeder::class,
+                ReportTrackerSeeder::class
             ]
         );
     }
