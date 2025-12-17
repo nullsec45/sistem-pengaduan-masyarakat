@@ -27,6 +27,7 @@ use Inertia\Inertia;
 // });
 
 Route::get('/', [HomeController::class, 'index']);
+Route::get('/report-tracker/{id}', [HomeController::class, 'tracker']);
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
