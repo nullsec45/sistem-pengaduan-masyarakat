@@ -1,16 +1,14 @@
 import { useEffect } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError'; // Komponen bawaan Breeze untuk error
+import InputError from '@/Components/InputError'; 
 import { Head, Link, useForm } from '@inertiajs/react';
 
-// Pastikan import ini sesuai dengan lokasi komponen UI Anda (misal: Shadcn UI)
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function Login({ status, canResetPassword }) {
-    // 1. Setup State & Form Helper dari Inertia
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -23,7 +21,6 @@ export default function Login({ status, canResetPassword }) {
         };
     }, []);
 
-    // 2. Handle 
     const submit = (e) => {
         e.preventDefault();
         post(route('login'));
@@ -33,7 +30,6 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head title="Log in" />
 
-            {/* Menampilkan status flash message jika ada (misal: "Password berhasil direset") */}
             {status && (
                 <div className="mb-4 font-medium text-sm text-green-600 text-center">
                     {status}
@@ -53,7 +49,6 @@ export default function Login({ status, canResetPassword }) {
                         <form onSubmit={submit}>
                             <div className="grid gap-4">
                                 
-                                {/* Input Email */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="email">Email</Label>
                                     <Input
@@ -66,11 +61,9 @@ export default function Login({ status, canResetPassword }) {
                                         onChange={(e) => setData('email', e.target.value)}
                                         required
                                     />
-                                    {/* Menampilkan Error Email */}
                                     <InputError message={errors.email} className="mt-0" />
                                 </div>
 
-                                {/* Input Password */}
                                 <div className="grid gap-2">
                                     <div className="flex items-center">
                                         <Label htmlFor="password">Password</Label>
@@ -93,17 +86,14 @@ export default function Login({ status, canResetPassword }) {
                                         onChange={(e) => setData('password', e.target.value)}
                                         required
                                     />
-                                    {/* Menampilkan Error Password */}
                                     <InputError message={errors.password} className="mt-0" />
                                 </div>
 
-                                {/* Tombol Login */}
                                 <Button type="submit" className="w-full" disabled={processing}>
                                     {processing ? 'Logging in...' : 'Login'}
                                 </Button>
                             </div>
 
-                            {/* Link Register */}
                             <div className="mt-4 text-center text-sm">
                                 Belum punya akun?{' '}
                                 <Link href={route('register')} className="underline">
