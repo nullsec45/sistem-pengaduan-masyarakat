@@ -23,7 +23,6 @@ class ReportFactory extends Factory
         $prefix = $category ? strtoupper(substr($category->name, 0, 3)) : 'GEN';
 
         return [
-            'reporter_id' => Reporter::inRandomOrder()->first()->id,
             'category_id' => Category::inRandomOrder()->first()->id,
             'ticket_id' =>   $prefix . '-' . strtoupper(Str::random(8)),
             'title'       => fake()->sentence(),
