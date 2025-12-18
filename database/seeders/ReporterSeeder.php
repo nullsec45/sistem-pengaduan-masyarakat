@@ -15,7 +15,7 @@ class ReporterSeeder extends Seeder
         $reporters = Reporter::all();
 
         if ($reporters->isEmpty()) {
-            $reporters = Reporter::factory(10)->create();
+            Reporter::factory(20)->create();
         }
     }
 }

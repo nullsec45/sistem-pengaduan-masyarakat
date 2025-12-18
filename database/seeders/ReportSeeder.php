@@ -3,9 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Reporter;
-use App\Models\Report;
-
+use App\Models\{Reporter, Report, ReportTracker};
 
 class ReportSeeder extends Seeder
 {
@@ -17,8 +15,13 @@ class ReportSeeder extends Seeder
         $reporters = Reporter::all();
 
         foreach ($reporters as $reporter) {
-            Report::factory(rand(1, 3))->create([
+            $report = Report::factory()->create([
                 'reporter_id' => $reporter->id,
+            ]);
+
+            ReportTracker::factory()->create([
+                'report_id' => $report->id,
+                'status'    => $report->status
             ]);
         }
     }
