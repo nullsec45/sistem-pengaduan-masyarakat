@@ -16,9 +16,8 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
-        // Jika Anda perlu username & phone_number sesuai schema sebelumnya, tambahkan disini:
-        // username: '',
-        // phone_number: '',
+        username: '',
+        phone_number: '',
     });
 
     useEffect(() => {
@@ -50,7 +49,6 @@ export default function Register() {
                         <form onSubmit={submit}>
                             <div className="grid gap-4">
                                 
-                                {/* Nama Lengkap */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="name">Nama Lengkap</Label>
                                     <Input 
@@ -65,13 +63,40 @@ export default function Register() {
                                     <InputError message={errors.name} />
                                 </div>
 
-                                {/* Email */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="username">Username</Label>
+                                    <Input 
+                                        id="username" 
+                                        placeholder="nullsec45" 
+                                        value={data.username}
+                                        onChange={(e) => setData('username', e.target.value)}
+                                        required 
+                                        autoFocus
+                                        autoComplete="username"
+                                    />
+                                    <InputError message={errors.username} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="phone_number">Phone Number</Label>
+                                    <Input 
+                                        id="phone_number" 
+                                        placeholder="08****" 
+                                        value={data.phone_number}
+                                        onChange={(e) => setData('phone_number', e.target.value)}
+                                        required 
+                                        autoFocus
+                                        autoComplete="phone_number"
+                                    />
+                                    <InputError message={errors.name} />
+                                </div>
+
                                 <div className="grid gap-2">
                                     <Label htmlFor="email">Email</Label>
                                     <Input
                                         id="email"
                                         type="email"
-                                        placeholder="m@example.com"
+                                        placeholder="email@example.com"
                                         value={data.email}
                                         onChange={(e) => setData('email', e.target.value)}
                                         required
@@ -80,7 +105,6 @@ export default function Register() {
                                     <InputError message={errors.email} />
                                 </div>
 
-                                {/* Password */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="password">Password</Label>
                                     <Input 
@@ -94,7 +118,6 @@ export default function Register() {
                                     <InputError message={errors.password} />
                                 </div>
 
-                                {/* Konfirmasi Password (Wajib untuk Laravel Default) */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="password_confirmation">Konfirmasi Password</Label>
                                     <Input 
@@ -108,7 +131,6 @@ export default function Register() {
                                     <InputError message={errors.password_confirmation} />
                                 </div>
 
-                                {/* Tombol Submit */}
                                 <Button type="submit" className="w-full" disabled={processing}>
                                     {processing ? 'Memproses...' : 'Buat Akun'}
                                 </Button>
