@@ -19,8 +19,6 @@ class ReportTrackerFactory extends Factory
     {
         return [
             'user_id' => User::inRandomOrder()->first()->id,
-            'report_id' => Report::inRandomOrder()->first()->id,
-            'status' =>   Report::inRandomOrder()->first()->status,
             'note' => fake()->paragraph(5),
         ];
     }
