@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasOne};
 
 class Report extends Model
 {
@@ -21,8 +21,8 @@ class Report extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
-    public function tracker(): BelongsTo
+    public function tracker(): HasOne
     {
-        return $this->belongsTo(ReportTracker::class, 'category_id', 'id');
+        return $this->hasOne(ReportTracker::class);
     }
 }
