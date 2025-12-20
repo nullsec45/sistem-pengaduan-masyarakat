@@ -1,9 +1,4 @@
-import { useState } from 'react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import {
   Users,
   FileText,
@@ -12,7 +7,9 @@ import {
   LogOut,
   Home,
   BarChart,
-  Megaphone
+  Megaphone,
+  Settings,
+  User
 } from "lucide-react";
 import { usePage } from '@inertiajs/react';
 import { Button } from "@/components/ui/button";
@@ -34,10 +31,15 @@ export default function Authenticated({ user, header, children }) {
 
     const navItems = [
         { href: "/dashboard", icon: Home, label: "Dashboard" },
-        { href: "/dashboard/users", icon: Users, label: "Daftar Pengguna" },
+        ...(user.role === 'ADMIN' ? [
+            { href: "/dashboard/users", icon: Users, label: "Daftar Pengguna" }
+        ] : []),
         { href: "/dashboard/reports", icon: FileText, label: "Daftar Aduan" },
-        { href: "/reports", icon: BarChart, label: "Lacak Laporan" },
     ];
+
+    if(user.role !== 'ADMIN') {
+        navItems.slice(1);
+    }
 
 
     return (
@@ -104,7 +106,11 @@ export default function Authenticated({ user, header, children }) {
                             ))}
                         </nav>
                         <div className="mt-auto">
-                            <Button variant="ghost" className="w-full justify-start">
+                           <Button 
+                                variant="ghost" 
+                                className="w-full justify-start"
+                                onClick={() => router.post('/logout')} 
+                            >
                                 <LogOut className="mr-2 h-4 w-4" />
                                 Logout
                             </Button>
@@ -133,13 +139,31 @@ export default function Authenticated({ user, header, children }) {
                                 <span className="sr-only">Toggle user menu</span>
                             </Button>
                         </DropdownMenuTrigger>
+                        
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Profile</DropdownMenuItem>
-                            <DropdownMenuItem>Settings</DropdownMenuItem>
+                            
+                            <DropdownMenuItem asChild>
+                                <Link href="/profile" className="cursor-pointer w-full flex items-center">
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </Link>
+                            </DropdownMenuItem>
+
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Logout</DropdownMenuItem>
+                            
+                            <DropdownMenuItem asChild>
+                                <Link 
+                                    href="/logout" 
+                                    method="post" 
+                                    as="button" 
+                                    className="cursor-pointer w-full flex items-center text-red-600 focus:text-red-600"
+                                >
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Logout</span>
+                                </Link>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </header>
