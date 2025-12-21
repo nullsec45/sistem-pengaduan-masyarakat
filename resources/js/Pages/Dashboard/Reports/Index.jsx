@@ -18,7 +18,7 @@ export default function Index({auth, reports}){
                     <p className="text-muted-foreground">Selamat datang di dasbor AspirasiKu.</p>
                 </div>
                 <Button className="mb-5" asChild>
-                    <Link href="/reports/create">Buat Laporan</Link>
+                    <Link href="/dashboard/reports/create">Buat Laporan</Link>
                 </Button>
                 <div className="grid gap-4 md:grid-">
                      
