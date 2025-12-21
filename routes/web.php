@@ -44,7 +44,10 @@ Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'dashboard'], function () {
         Route::get('/', [ReportController::class, 'dashboard']);
         Route::get('users', [UserController::class, 'index']);
-        Route::get('reports', [ReportController::class, 'index']);
+        Route::controller(ReportController::class)->prefix('reports')->group(function () {
+            Route::get('/', 'index');
+            Route::get('create', 'create');
+        });
     });
 });
 
