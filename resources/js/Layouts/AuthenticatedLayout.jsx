@@ -26,7 +26,7 @@ import {
   } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function Authenticated({ user, header, children }) {
+export default function AuthenticatedLayout({ user, children }) {
     const { url } = usePage();
 
     const navItems = [
