@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
-use Illuminate\Auth\Events\Registered;
+// use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
+// use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\DB;
 
 class RegisteredUserController extends Controller
 {
@@ -29,28 +31,33 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(UserRequest $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'phone_number' => 'required|numeric|digits_between:10,15',
-            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'username' => $request->username,
+                'phone_number' => $request->phone_number,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'username' => $request->username,
-            'phone_number' => $request->phone_number,
-            'password' => Hash::make($request->password),
-        ]);
+            DB::commit();
 
-        event(new Registered($user));
+            // event(new Registered($user));
 
-        Auth::login($user);
+            Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+            return redirect(RouteServiceProvider::HOME);
+        } catch (\Throwable $err) {
+            DB::rollBack();
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' =>   $err->getMessage()
+                ]);
+        }
     }
 }
