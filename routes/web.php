@@ -41,13 +41,27 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::group(['prefix' => 'dashboard'], function () {
-        Route::get('/', [ReportController::class, 'dashboard']);
-        Route::get('users', [UserController::class, 'index']);
-        Route::controller(ReportController::class)->prefix('reports')->group(function () {
-            Route::get('/', 'index');
-            Route::get('create', 'create');
-        });
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+
+        Route::get('/', [ReportController::class, 'dashboard'])->name('index');
+
+        Route::controller(UserController::class)
+            ->prefix('users')
+            ->name('users.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/create', 'create')->name('create');
+                Route::post('/store', 'store')->name('store');
+            });
+
+        Route::controller(ReportController::class)
+            ->prefix('reports')
+            ->name('reports.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/create', 'create')->name('create');
+                Route::get('/store', 'store')->name('store');
+            });
     });
 });
 
