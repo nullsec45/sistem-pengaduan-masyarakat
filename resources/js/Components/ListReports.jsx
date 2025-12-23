@@ -24,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from '@/components/ui/textarea';
-import { Pencil, Trash } from "lucide-react";
+import { Pencil, Trash, FileText } from "lucide-react";
 
 
 const getStatusColor = (status) => {
