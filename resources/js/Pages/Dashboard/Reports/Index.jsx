@@ -17,9 +17,12 @@ export default function Index({auth, reports}){
                     <h1 className="text-4xl font-bold font-headline">Daftar Aspirasi Masyarakat</h1>
                     <p className="text-muted-foreground">Selamat datang di dasbor AspirasiKu.</p>
                 </div>
-                <Button className="mb-5" asChild>
-                    <Link href="/dashboard/reports/create">Buat Laporan</Link>
-                </Button>
+                {auth.user.role == 'USER' && (
+                    <Button className="mb-5" asChild>
+                        <Link href="/dashboard/reports/create">Buat Laporan</Link>
+                    </Button>
+                )}
+                
                 <div className="grid gap-4 md:grid-">
                      
                    <ListReport  reports={reports} action={true} user={auth.user}/> 
