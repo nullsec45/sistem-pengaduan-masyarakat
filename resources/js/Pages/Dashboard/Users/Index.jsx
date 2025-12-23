@@ -18,7 +18,7 @@ export default function Index({auth, users}){
                     <p className="text-muted-foreground">List data pengguna yang terdaftar.</p>
                 </div>
                 <Button className="mb-5" asChild>
-                    <Link href="/users/create">Buat User</Link>
+                    <Link href="/dashboard/users/create">Buat User</Link>
                 </Button>
                 <div className="grid gap-4 md:grid-">
                      
