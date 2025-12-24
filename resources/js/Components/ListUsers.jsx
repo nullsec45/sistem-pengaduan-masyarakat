@@ -50,7 +50,7 @@ export default function ListUsers({ users }) {
                                         <TableCell>
                                             <div className="flex items-center gap-2">
                                                 <Button variant="outline" size="sm" asChild className="h-8">
-                                                    <Link href={`/users/${user.id}/edit`}>
+                                                    <Link href={`/dashboard/users/${user.id}/edit`}>
                                                         <Pencil className="w-3.5 h-3.5 mr-2" />
                                                         Edit
                                                     </Link>

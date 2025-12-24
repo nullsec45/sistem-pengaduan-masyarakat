@@ -26,18 +26,14 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $testEnum = \App\Enums\RoleEnum::tryFrom($this->role);
-        // dd([
-        //     'Input dari Frontend' => $this->role,
-        //     'Tipe Data Input' => gettype($this->role),
-        //     'Apakah Enum Mengenali?' => $testEnum,
-        //     'Semua Cases Enum' => \App\Enums\RoleEnum::cases()
-        // ]);
-        return [
+        $userId = $this->route()->parameter('id');
+        $checkRoute = $this->route()->getName();
+
+        $rules = [
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'phone_number' => 'required|numeric|digits_between:10,15',
-            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
+            'username' => ['required', 'string', 'max:255', Rule::unique(User::class)->ignore($userId)],
+            'phone_number' => ['required', 'numeric', 'digits_between:10,15', Rule::unique(User::class)->ignore($userId)],
+            'email' =>  ['required', 'email', 'lowercase', 'max:255', Rule::unique(User::class)->ignore($userId)],
             'role' => [
                 'required',
                 Rule::enum(RoleEnum::class)
@@ -45,5 +41,12 @@ class UserRequest extends FormRequest
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'password_confirmation' => ['required', Rules\Password::defaults()],
         ];
+
+        if ($checkRoute === "dashboard.users.update") {
+            unset($rules['password']);
+            unset($rules['password_confirmation']);
+        }
+
+        return  $rules;
     }
 }

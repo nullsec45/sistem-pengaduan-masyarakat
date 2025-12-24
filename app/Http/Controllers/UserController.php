@@ -67,25 +67,52 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        $user = User::find($id);
+
+
+        return Inertia::render('Dashboard/Users/EditUser', ['user' => $user]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UserRequest $request, string $id)
     {
-        //
+        DB::beginTransaction();
+        try {
+            $user = User::find($id);
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->username = $request->username;
+            $user->phone_number = $request->phone_number;
+
+            if ($request->password) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->save();
+
+            DB::commit();
+
+
+            return redirect()->route('dashboard.users.index');
+        } catch (\Throwable $err) {
+            DB::rollBack();
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' =>   $err->getMessage()
+                ]);
+        }
     }
 
     /**
