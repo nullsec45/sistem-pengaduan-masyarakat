@@ -11,6 +11,13 @@ class Report extends Model
     use HasFactory;
 
 
+    protected $fillable = [
+        'reporter_id',
+        'title',
+        'description',
+        'category_id',
+    ];
+
     public function reporter(): BelongsTo
     {
         return $this->belongsTo(Reporter::class, 'reporter_id', 'id');
