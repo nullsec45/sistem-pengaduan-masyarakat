@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ReportRequest;
 
 class ReportController extends Controller
 {
@@ -36,6 +37,23 @@ class ReportController extends Controller
 
     public function create()
     {
+        $categories = Category::all();
+
+        return Inertia::render('Dashboard/Reports/CreateReport', ['categories' => $categories]);
+    }
+
+    public function show(String $id)
+    {
+        $report = Report::find($id);
+
+        $report->load('tracker');
+
+        return Inertia::render('Dashboard/Reports/Show', ['report' => $report]);
+    }
+
+    public function store(ReportRequest $request)
+    {
+        dd($request->all());
         $categories = Category::all();
 
         return Inertia::render('Dashboard/Reports/CreateReport', ['categories' => $categories]);
