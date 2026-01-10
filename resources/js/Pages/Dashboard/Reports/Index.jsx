@@ -4,7 +4,8 @@ import ListReport from "@/Components/ListReports";
 import { Button } from "@/components/ui/button";
 import {Link} from "@inertiajs/react";
 
-export default function Index({auth, reports}){
+export default function Index({auth, reports, home}){
+    console.log(home);
        return (
          <AuthenticatedLayout
             user={auth.user}
@@ -25,7 +26,7 @@ export default function Index({auth, reports}){
                 
                 <div className="grid gap-4 md:grid-">
                      
-                   <ListReport  reports={reports} action={true} user={auth.user}/> 
+                   <ListReport  reports={reports} action={true} user={auth.user} home={home}/> 
                 </div>
             </div>
         </AuthenticatedLayout>

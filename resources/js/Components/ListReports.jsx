@@ -50,7 +50,7 @@ const statuses = [
     { value: "Laporan Ditolak", label: "Laporan Ditolak" },
 ];
 
-export default function ListReport({ reports, action, user }) {
+export default function ListReport({ reports, action, user, home }) {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [selectedReport, setSelectedReport] = useState(null);
@@ -127,7 +127,7 @@ export default function ListReport({ reports, action, user }) {
                                         </TableCell>
                                         <TableCell className="font-medium">
                                             <Link 
-                                                href={`/report-tracker/${report.id}`} 
+                                                href={home ?  `/report-tracker/${report.id}`  :  `/dashboard/reports/${report.id}/show` } 
                                                 className="text-blue-600 hover:text-blue-800 hover:underline"
                                             >
                                                 {report.title}
@@ -145,8 +145,8 @@ export default function ListReport({ reports, action, user }) {
                                             })}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge className={`${getStatusColor(report.status)} border-0`}>
-                                                {report.status}
+                                            <Badge className={`${getStatusColor(report.tracker.status)} border-0`}>
+                                                {report.tracker.status}
                                             </Badge>
                                         </TableCell>
                                         {action && user.role == 'ADMIN' && (
