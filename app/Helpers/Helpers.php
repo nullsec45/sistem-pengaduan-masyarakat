@@ -34,16 +34,23 @@ class Helpers
 
 
         if ($typeUpload == "update") {
-            $storage = Storage::disk('public');
-            $fileOld = $path . "/" . $fileOld;
-            if ($storage->exists($path . '/' . $fileOld)) {
-                $storage->delete($path . '/' . $fileOld);
-            }
-        }
+            $this->fileDeleteHandling($path, $fileOld);
+}
 
         $fileName = $prefixName . "_" . $this->hashFile($file->getClientOriginalName()) . "_" . time() . "." . $file->getClientOriginalExtension();
         $file->storeAs($path, $fileName, "public");
 
         return $fileName;
+    }
+
+    public function fileDeleteHandling($path, $fileName)
+    {
+        $storage = Storage::disk('public');
+        $file = $path . "/" . $fileName;
+        if ($storage->exists($file)) {
+            $storage->delete($file);
+        }
+
+        return true;
     }
 }
