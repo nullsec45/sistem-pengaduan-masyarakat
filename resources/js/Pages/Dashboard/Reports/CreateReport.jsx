@@ -1,285 +1,240 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useForm, Link } from '@inertiajs/react'; 
+import { AlertCircleIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import ReportSchema from "@/Validation/ReportValidate";
-import { Link } from "@inertiajs/react";
+import InputError from "@/Components/InputError"; 
+import { Alert, AlertDescription, AlertTitle, } from "@/components/ui/alert";
 
-export default function CreateReport({auth}){
-    const [isPending, startTransition] = useTransition();
-
-    const form = useForm({
-        resolver: zodResolver(ReportSchema),
-        defaultValues: {
-            nama: '',
-            email: '',
-            nomorHp: '',
-            nomorIdentitas: '',
-            tempatLahir: '',
-            alamat: '',
-            judulLaporan: '',
-            deskripsiLaporan: '',
-            buktiLaporan: undefined,
-        },
+export default function CreateReport({ auth, categories }) {
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: auth.user.name || '',
+        email: auth.user.email || '',
+        phone_number: auth.user.phone_number || '',
+        identity_type: '',
+        identity_number: '',
+        pob: '', 
+        dob: '', 
+        address: '',
+        title: '',
+        description: '',
+        category_id: '',
+        evidence: null,
     });
 
-    function onSubmit(values) {
-        startTransition(async () => {
-            const formData = new FormData();
-            Object.keys(values).forEach(key => {
-                if (key === 'tanggalLahir' && values[key]) {
-                    formData.append(key, values[key].toISOString());
-                } else if (key === 'buktiLaporan' && values[key]) {
-                    formData.append(key, values[key]);
-                } else if (values[key]) {
-                    formData.append(key, values[key]);
-                }
-            });
-            
+    function onSubmit(e) {
+        e.preventDefault();
+        post(route('dashboard.reports.store'), {
+            forceFormData: true, 
+            onSuccess: () => reset(),
         });
     }
 
-    return(
+    return (
         <AuthenticatedLayout 
             user={auth.user}
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
         >
-        <Card>
-        <CardHeader>
-          <CardTitle className="font-headline text-3xl">Formulir Pengaduan</CardTitle>
-          <CardDescription>Sampaikan keluhan, masukan, dan pengaduan Anda melalui formulir di bawah ini.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <FormField
-                  control={form.control}
-                  name="nama"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nama Lengkap</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="john.doe@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="nomorHp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nomor HP</FormLabel>
-                      <FormControl>
-                        <Input placeholder="081234567890" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="tipeIdentitas"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipe Identitas</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih tipe identitas" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="KTP">KTP</SelectItem>
-                          <SelectItem value="SIM">SIM</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="nomorIdentitas"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nomor Identitas</FormLabel>
-                      <FormControl>
-                        <Input placeholder="3201234567890001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="tempatLahir"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tempat Lahir</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Jakarta" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="tanggalLahir"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Tanggal Lahir</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pilih tanggal</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="alamat"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Alamat</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Jl. Merdeka No. 10, Jakarta" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="judulLaporan"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Judul Laporan</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Jalan Rusak di Depan Rumah" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="deskripsiLaporan"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Deskripsi Laporan</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Tuliskan detail laporan Anda di sini..." {...field} rows={5} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                    control={form.control}
-                    name="buktiLaporan"
-                    render={({ field: { value, onChange, ...fieldProps } }) => (
-                         <FormItem>
-                            <FormLabel>Bukti Laporan</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    {...fieldProps} 
-                                    type="file" 
-                                    onChange={(event) => {
-                                        onChange(event.target.files && event.target.files[0]);
-                                    }}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem> 
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline text-3xl">Formulir Pengaduan</CardTitle>
+                    <CardDescription>Sampaikan keluhan, masukan, dan pengaduan Anda melalui formulir di bawah ini.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {errors.error && (
+                        <Alert variant="destructive" className="mb-6">
+                            <AlertCircleIcon className="h-4 w-4" />
+                            <AlertTitle>Gagal Menyimpan</AlertTitle>
+                            <AlertDescription>
+                                {errors.error}
+                            </AlertDescription>
+                        </Alert>
                     )}
-                />
-              </div>
 
-            <div className="flex justify-end gap-4 pt-4">
-                <Button 
-                    type="button" 
-                    variant="destructive"
-                    className="bg-red-500 hover:bg-red-600 text-white"
-                    asChild
-                >
-                    <Link href="/dashboard/reports">Batal</Link>
-                </Button>
+                    <form onSubmit={onSubmit} className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Nama Lengkap</Label>
+                                <Input 
+                                    id="name"
+                                    placeholder="John Doe"
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                />
+                                <InputError message={errors.name} />
+                            </div>
 
-                <Button 
-                    type="submit" 
-                    disabled={isPending} 
-                    className="bg-green-500 hover:bg-green-600 text-white"
-                >
-                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Buat Laporan
-                </Button>
-            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input 
+                                    id="email"
+                                    type="email"
+                                    placeholder="john.doe@example.com"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                />
+                                <InputError message={errors.email} />
+                            </div>
 
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </AuthenticatedLayout>
-    )
+                            <div className="space-y-2">
+                                <Label htmlFor="phone_number">Nomor HP</Label>
+                                <Input 
+                                    id="phone_number"
+                                    placeholder="081234567890"
+                                    value={data.phone_number}
+                                    onChange={(e) => setData('phone_number', e.target.value)}
+                                />
+                                <InputError message={errors.phone_number} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Tipe Identitas</Label>
+                                <Select 
+                                    onValueChange={(val) => setData('identity_type', val)}
+                                    defaultValue={data.identity_type}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih tipe identitas" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="KTP">KTP</SelectItem>
+                                        <SelectItem value="SIM">SIM</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.identity_type} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="identity_number">Nomor Identitas</Label>
+                                <Input 
+                                    id="identity_number"
+                                    placeholder="3201xxxxxxxx"
+                                    value={data.identity_number}
+                                    onChange={(e) => setData('identity_number', e.target.value)}
+                                />
+                                <InputError message={errors.identity_number} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="pob">Tempat Lahir</Label>
+                                <Input 
+                                    id="pob"
+                                    placeholder="Jakarta"
+                                    value={data.pob}
+                                    onChange={(e) => setData('pob', e.target.value)}
+                                />
+                                <InputError message={errors.pob} />
+                            </div>
+
+                            <div className="space-y-2 flex flex-col">
+                                <Label>Tanggal Lahir</Label>
+                               <Input 
+                                    id="dob"
+                                    type="date" // Menggunakan native picker browser
+                                    value={data.dob}
+                                    max={new Date().toISOString().split("T")[0]} // Tidak boleh pilih masa depan
+                                    onChange={(e) => setData('dob', e.target.value)}
+                                />
+                                <InputError message={errors.dob} />
+                            </div>
+
+                            {/* Alamat */}
+                            <div className="space-y-2">
+                                <Label htmlFor="address">Alamat</Label>
+                                <Textarea 
+                                    id="address"
+                                    placeholder="Jl. Merdeka No. 10..." 
+                                    value={data.address}
+                                    onChange={(e) => setData('address', e.target.value)}
+                                />
+                                <InputError message={errors.address} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="title">Judul Laporan</Label>
+                                <Input 
+                                    id="title"
+                                    placeholder="Jalan Rusak..." 
+                                    value={data.title}
+                                    onChange={(e) => setData('title', e.target.value)}
+                                />
+                                <InputError message={errors.title} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Kategori Laporan</Label>
+                                <Select 
+                                    onValueChange={(val) => setData('category_id', val)}
+                                    defaultValue={String(data.category_id)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih Kategori" />
+                                    </SelectTrigger>
+                                   
+                                    <SelectContent>
+                                        {categories && categories.map((category) => (
+                                            <SelectItem key={category.id} value={String(category.id)}>{category.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.identity_type} />
+                            </div>
+                        </div>
+
+                       
+
+                        <div className="space-y-6">
+                            {/* Deskripsi */}
+                            <div className="space-y-2">
+                                <Label htmlFor="description">Deskripsi Laporan</Label>
+                                <Textarea 
+                                    id="description"
+                                    placeholder="Detail laporan..." 
+                                    rows={5}
+                                    value={data.description}
+                                    onChange={(e) => setData('description', e.target.value)}
+                                />
+                                <InputError message={errors.description} />
+                            </div>
+                            
+                            {/* Bukti Laporan */}
+                            <div className="space-y-2">
+                                <Label htmlFor="evidence">Bukti Laporan</Label>
+                                <Input 
+                                    id="evidence"
+                                    type="file" 
+                                    onChange={(e) => setData('evidence', e.target.files[0])}
+                                />
+                                <InputError message={errors.evidence} />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-4 pt-4">
+                            <Button 
+                                type="button" 
+                                variant="destructive"
+                                className="bg-red-500 hover:bg-red-600 text-white"
+                                asChild
+                            >
+                                <Link href="/dashboard/reports">Batal</Link>
+                            </Button>
+
+                            <Button 
+                                type="submit" 
+                                disabled={processing} 
+                                className="bg-green-500 hover:bg-green-600 text-white"
+                            >
+                                {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                Buat Laporan
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+        </AuthenticatedLayout>
+    );
 }

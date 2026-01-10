@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class ReportTracker extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'report_id',
+        'user_id',
+        'status',
+        'note'
+    ];
 }

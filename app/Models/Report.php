@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasOne};
+use Illuminate\Support\Facades\Auth;
 
 class Report extends Model
 {
@@ -16,6 +17,7 @@ class Report extends Model
         'title',
         'description',
         'category_id',
+        'ticket_id',
     ];
 
     public function reporter(): BelongsTo
@@ -31,5 +33,21 @@ class Report extends Model
     public function tracker(): HasOne
     {
         return $this->hasOne(ReportTracker::class);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($model) {
+            // $model->status = 'Pending';
+            ReportTracker::firstOrCreate(
+                [
+                    'report_id' => $model->id,
+                    'user_id' => Auth::user()->id,
+                ],
+                ['status' => 'Pending']
+            );
+        });
     }
 }
