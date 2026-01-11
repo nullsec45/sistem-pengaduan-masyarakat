@@ -21,7 +21,10 @@ class ReportRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+
+        $checkRoute = $this->route()->getName();
+
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone_number' => 'required|string|max:20',
@@ -33,7 +36,13 @@ class ReportRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string|min:10',
             'category_id' => 'required|exists:categories,id',
-            'evidence' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+            'evidence' => 'required|file|mimes:jpg,jpeg,png|max:4096',
         ];
+
+        if ($checkRoute === "dashboard.reports.update") {
+            $rules['evidence'] = 'nullable|file|mimes:jpg,jpeg,png|max:4096';
+        }
+
+        return $rules;
     }
 }
