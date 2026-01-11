@@ -12,6 +12,7 @@ class Report extends Model
     use HasFactory;
 
 
+
     protected $fillable = [
         'reporter_id',
         'title',
@@ -33,6 +34,11 @@ class Report extends Model
     public function tracker(): HasOne
     {
         return $this->hasOne(ReportTracker::class);
+    }
+
+    public function media()
+    {
+        return $this->morphMany(Media::class, 'model');
     }
 
     public static function boot()
