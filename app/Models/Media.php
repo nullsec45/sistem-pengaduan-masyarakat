@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Media extends Model
 {
     use HasFactory;
+
+    protected $appends = ['original_url'];
+
 
     protected $fillable = [
         'model_type',
@@ -25,4 +29,10 @@ class Media extends Model
         'responsive_images',
         'order_column',
     ];
+
+    public function getOriginalUrlAttribute()
+    {
+        $url = $this->path . "/" . $this->file_name;
+        return Storage::url($url);
+    }
 }
