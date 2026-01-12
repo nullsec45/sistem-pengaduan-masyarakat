@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/{id}/show', 'show')->name('show');
                 Route::get('/{id}/edit', 'edit')->name('edit');
                 Route::put('/{id}', 'update')->name('update');
+                Route::put('/update-status/{id}', 'updateStatus')->name('update-status');
             });
     });
 });
