@@ -1,9 +1,11 @@
 // Ubah import ini
-import { Link } from '@inertiajs/react'; 
-import { Megaphone, FileText, BarChart, LogIn, UserPlus } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react'; 
+import { Megaphone, LayoutDashboardIcon, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
+  const { auth } = usePage().props;
+
   return (
    <header className="bg-card border-b sticky top-0 z-10 shadow-sm">
       <div className="container mx-auto px-4">
@@ -16,9 +18,17 @@ export default function Navbar() {
           </Link>
           <nav className="hidden md:flex items-center gap-1">
              <Button asChild>
-              <Link href="/login">
-                <LogIn className="mr-2" />
-                Login
+              <Link href={auth.user ? "/dashboard" : "/login"}>
+                {auth.user ? (
+                  <>
+                    <LayoutDashboardIcon className="mr-2" />
+                    Masuk ke Dashboard
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="mr-2" />
+                    Login
+                  </>)}
               </Link>
             </Button>
             <Button variant="outline" asChild>
