@@ -52,21 +52,25 @@ export default function AuthenticatedLayout({ user, children }) {
                     </Link>
                 </div>
                 <nav className="flex-1 flex flex-col gap-1 p-4">
-                    {navItems.map(item => (
-                    <Button
-                        key={item.href}
-                        asChild
-                        variant={url === item.href ? "secondary" : "ghost"}
-                        className="justify-start"
-                    >
-                        <Link
-                        href={item.href}
-                        >
-                            <item.icon className="mr-2 h-5 w-5" />
-                            {item.label}
-                        </Link>
-                    </Button>
-                    ))}
+                    {navItems.map(item => {
+                        const isActive = item.href === "/dashboard"  ? url === "/dashboard" : url.startsWith(item.href);
+
+                        return (    
+                            <Button
+                                key={item.href}
+                                asChild
+                                variant={isActive ? "secondary" : "ghost"}
+                                className="justify-start"
+                            >
+                                <Link
+                                href={item.href}
+                                >
+                                    <item.icon className="mr-2 h-5 w-5" />
+                                    {item.label}
+                                </Link>
+                            </Button>
+                    )
+                    } )}
                 </nav>  
             </aside>
             <div className="flex flex-col flex-1">
@@ -91,19 +95,23 @@ export default function AuthenticatedLayout({ user, children }) {
                                 <Megaphone className="h-6 w-6 text-primary" />
                                 <span className="sr-only">AspirasiKu</span>
                             </Link>
-                            {navItems.map(item => (
-                                <Link
-                                key={item.href}
-                                href={item.href}
-                                className={cn(
-                                    "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-                                    url === item.href && "bg-muted text-foreground"
-                                )}
-                                >
-                                    <item.icon className="h-5 w-5" />
-                                    {item.label}
-                                </Link>
-                            ))}
+                            {navItems.map(item => {
+                                const isActive = item.href === "/dashboard"  ? url === "/dashboard" : url.startsWith(item.href);
+
+                                return (
+                                    <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
+                                        isActive && "bg-muted text-foreground"
+                                    )}
+                                    >
+                                        <item.icon className="h-5 w-5" />
+                                        {item.label}
+                                    </Link>
+                                )
+                            })}
                         </nav>
                         <div className="mt-auto">
                            <Button 
