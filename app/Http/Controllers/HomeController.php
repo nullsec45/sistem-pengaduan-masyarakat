@@ -19,7 +19,7 @@ class HomeController extends Controller
 
     public function tracker(string $id)
     {
-        $report = Report::with('tracker')->findOrFail($id);
+        $report = Report::with('tracker', 'media')->findOrFail($id);
 
         return Inertia::render('Home/StatusReportTracker', ['report' => $report]);
     }

@@ -2,6 +2,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import HomeLayout from "@/Layouts/HomeLayout";
 import StatusTracker from "@/Components/StatusTracker";
+import { Link } from "@inertiajs/react";
+import { SlashIcon } from "lucide-react"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 export default  function StatusReportTracker({ report }) {
   const getStatusVariant = (status) => {
@@ -24,6 +34,24 @@ export default  function StatusReportTracker({ report }) {
       <div className="space-y-6">
            <Card>
             <CardHeader>
+              <div className="mb-4">
+                  <Breadcrumb>
+                      <BreadcrumbList>
+                          <BreadcrumbItem>
+                              <BreadcrumbLink asChild>
+                                  <Link href="/">Home</Link>
+                              </BreadcrumbLink>
+                          </BreadcrumbItem>
+                          <BreadcrumbSeparator>
+                              <SlashIcon />
+                          </BreadcrumbSeparator>
+                          <BreadcrumbItem>
+                              <BreadcrumbPage>Report Tracker</BreadcrumbPage>
+                          </BreadcrumbItem>
+                      </BreadcrumbList>
+                  </Breadcrumb>
+              </div>
+
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="font-headline text-xl">{report.title}</CardTitle>
@@ -44,7 +72,7 @@ export default  function StatusReportTracker({ report }) {
                           <img 
                             src={item.original_url} 
                             alt={`Bukti ${index + 1}`} 
-                            className="object-cover w-full h-full hover:scale-105 transition-transform duration-300 cursor-pointer"
+                            className="object-containt w-full h-full hover:scale-105 transition-transform duration-300 cursor-pointer"
                           />
                         </div>
                       ))}
