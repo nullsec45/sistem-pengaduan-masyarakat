@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {Link} from "@inertiajs/react";
 
 export default function Index({auth, reports, home}){
-    console.log(home);
        return (
          <AuthenticatedLayout
             user={auth.user}
