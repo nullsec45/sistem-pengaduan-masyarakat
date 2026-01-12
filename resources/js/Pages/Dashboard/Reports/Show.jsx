@@ -1,16 +1,21 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
-import ListReport from "@/Components/ListReports";
-import { Button } from "@/components/ui/button";
 import {Link} from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import StatusTracker from "@/Components/StatusTracker";
+import { SlashIcon } from "lucide-react"
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 export default function Show({auth, report}){
-  console.log(report.media);
-
         const getStatusVariant = (status) => {
             switch (status) {
             case 'Selesai Ditangani':
@@ -37,19 +42,36 @@ export default function Show({auth, report}){
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold font-headline">Detail Laporan</h1>
                     <p className="text-muted-foreground">{`Memantau perkembangan laporan dengan ID ${report.ticket_id}`}</p>
-                </div>
-             
+                </div>             
             </div>
             <div className="space-y-6">
                 <Card>
                     <CardHeader>
-                    <div className="flex justify-between items-start">
-                        <div>
-                        <CardTitle className="font-headline text-xl">{report.title}</CardTitle>
-                        <p className="text-sm text-muted-foreground">ID: {report.ticket_id} • Tanggal: {new Date(report.created_at).toLocaleDateString('id-ID')}</p>
+                        <div className="mb-4">
+                            <Breadcrumb>
+                                <BreadcrumbList>
+                                    <BreadcrumbItem>
+                                        <BreadcrumbLink asChild>
+                                            <Link href="/dashboard/reports">Daftar Aduan</Link>
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator>
+                                        <SlashIcon />
+                                    </BreadcrumbSeparator>
+                                    <BreadcrumbItem>
+                                        <BreadcrumbPage>Detail Laporan</BreadcrumbPage>
+                                    </BreadcrumbItem>
+                                </BreadcrumbList>
+                            </Breadcrumb>
                         </div>
-                        <Badge variant={getStatusVariant(report.tracker.status)}>{report.tracker.status}</Badge>
-                    </div>
+
+                        <div className="flex justify-between items-start">
+                            <div>
+                            <CardTitle className="font-headline text-xl">{report.title}</CardTitle>
+                            <p className="text-sm text-muted-foreground">ID: {report.ticket_id} • Tanggal: {new Date(report.created_at).toLocaleDateString('id-ID')}</p>
+                            </div>
+                            <Badge variant={getStatusVariant(report.tracker.status)}>{report.tracker.status}</Badge>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <p className="mb-4 text-sm">{report.description}</p>
