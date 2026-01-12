@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useForm, Link } from '@inertiajs/react'; 
-import { AlertCircleIcon, Loader2 } from 'lucide-react';
+import { AlertCircleIcon, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import InputError from "@/Components/InputError"; 
 import { Alert, AlertDescription, AlertTitle, } from "@/components/ui/alert";
+import {  useState } from "react";
 
 export default function CreateReport({ auth, categories }) {
+    const [previewUrl, setPreviewUrl] = useState(null); 
+    
     const { data, setData, post, processing, errors, reset } = useForm({
         name: auth.user.name || '',
         email: auth.user.email || '',
@@ -25,6 +28,24 @@ export default function CreateReport({ auth, categories }) {
         category_id: '',
         evidence: null,
     });
+
+     const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('evidence', file);
+            setPreviewUrl(URL.createObjectURL(file));
+        } else {
+            setData('evidence', null);
+            setPreviewUrl(null);
+        }
+    };
+
+     const clearImage = () => {
+        setData('evidence', null);
+        setPreviewUrl(null);
+        document.getElementById('evidence').value = "";
+    };
+
 
     function onSubmit(e) {
         e.preventDefault();
@@ -207,9 +228,30 @@ export default function CreateReport({ auth, categories }) {
                                 <Input 
                                     id="evidence"
                                     type="file" 
-                                    onChange={(e) => setData('evidence', e.target.files[0])}
+                                    accept="image/*"
+                                    onChange={handleFileChange}
                                 />
                                 <InputError message={errors.evidence} />
+
+                                 {previewUrl && (
+                                    <div className="relative mt-4 w-full md:w-1/2 h-64 bg-gray-50 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center group">
+                                        <img
+                                            src={previewUrl}
+                                            alt="Preview Bukti"
+                                            className="w-full h-full object-contain transition-opacity group-hover:opacity-90"
+                                        />
+
+                                        {/* Tombol Hapus Gambar */}
+                                        <button
+                                            type="button"
+                                            onClick={clearImage}
+                                            className="absolute top-2 right-2 p-1.5 bg-white/80 text-gray-600 rounded-full shadow-sm backdrop-blur-sm hover:bg-red-100 hover:text-red-600 transition-all"
+                                            title="Hapus gambar"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
