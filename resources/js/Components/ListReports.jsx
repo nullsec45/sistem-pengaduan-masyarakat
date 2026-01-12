@@ -7,10 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link } from '@inertiajs/react';
+import { useForm, Link } from '@inertiajs/react';
 import { Badge } from "@/components/ui/badge";
 import { useState, useTransition } from "react";
-import VerificationValidate from "@/Validation/VerificationValidate";
+// import VerificationValidate from "@/Validation/VerificationValidate";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -19,12 +19,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+// import { useForm } from "react-hook-form";
+// import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from '@/components/ui/textarea';
 import { Pencil, Trash, FileText } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import InputError from "@/Components/InputError"; 
 
 
 const getStatusColor = (status) => {
@@ -54,51 +55,45 @@ export default function ListReport({ reports, action, user, home }) {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [selectedReport, setSelectedReport] = useState(null);
-    const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
+    // const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
 
-      const form = useForm({
-        resolver: zodResolver(VerificationValidate),
-        defaultValues: {
-            status: '',
-            operatorNotes: '',
-        },
+    // const form = useForm({
+    //     resolver: zodResolver(VerificationValidate),
+    //     defaultValues: {
+    //         status: '',
+    //         operatorNotes: '',
+    //     },
+    // });
+
+
+     const { data, setData, put, processing, errors, reset } = useForm({
+        status:'',
+        note:'',
     });
     
     const handleVerifyClick = (report) => {
+        console.log(report.tracker.note);
         setSelectedReport(report);
-        form.reset({
-            status: report.status || '',
-            operatorNotes: report.catatan || '',
+        setData({
+            status: report.tracker?.status || '',
+            note: report.tracker?.note || '',
         });
         setIsSheetOpen(true);
+
+        console.log(data.note);
     };
 
-     const verificationSide = (values) => {
-        startTransition(async () => {
-            const result = await updateComplaintStatus({
-                complaintId: selectedComplaint.id,
-                ...values,
-            });
 
-            if (result.success) {
-                toast({
-                    title: 'Status Laporan Diperbarui',
-                    description: `Status untuk laporan ${selectedComplaint.id} telah diubah.`,
-                });
-                // Optimistically update UI
-                setComplaints(complaints.map(c => c.id === selectedComplaint.id ? {...c, status: values.status, kategori: values.category, catatan: values.operatorNotes} : c));
+
+    const submitVerification = (e) => {
+        e.preventDefault();
+        put(route('dashboard.reports.update-status', selectedReport.id), {
+            onSuccess: () => {
                 setIsSheetOpen(false);
-                setAiSummary(result.summary);
-                setIsSummaryDialogOpen(true);
-            } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Gagal Memperbarui',
-                    description: result.message || 'Terjadi kesalahan.',
-                });
-            }
+                reset();
+            },
         });
-    }
+    };
 
     return (
         <>
@@ -232,7 +227,7 @@ export default function ListReport({ reports, action, user, home }) {
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetContent className="sm:max-w-lg">
                     <SheetHeader>
-                    <SheetTitle className="font-headline">Verifikasi Laporan: {selectedReport.id}</SheetTitle>
+                    <SheetTitle className="font-headline">Verifikasi Laporan: {selectedReport.ticket_id}</SheetTitle>
                     <SheetDescription>
                         Perbarui status, kategori, dan tambahkan catatan untuk laporan ini.
                     </SheetDescription>
@@ -243,52 +238,52 @@ export default function ListReport({ reports, action, user, home }) {
                                 <h3 className="font-semibold">Detail Laporan</h3>
                             </CardHeader>
                             <CardContent className="text-sm space-y-2">
-                                <p><strong>Pelapor:</strong> {selectedReport.name}</p>
+                                <p><strong>Pelapor:</strong> {selectedReport.reporter.name}</p>
                                 <p><strong>Judul:</strong> {selectedReport.title}</p>
                                 <p><strong>Deskripsi:</strong> {selectedReport.description}</p>
                             </CardContent>
                         </Card>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(verificationSide)} className="space-y-6">
-                                <FormField
-                                    control={form.control}
-                                    name="status"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <FormLabel>Status</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Pilih status" />
-                                            </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {statuses.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
+
+                        <form onSubmit={submitVerification} className="space-y-6">
+                            <div className="space-y-2">
+                                <Label>Status Laporan</Label>
+                                <Select 
+                                    onValueChange={(val) => setData('status', val)}
+                                    defaultValue={selectedReport.tracker.status}
+                                    // value={selectedReport.tracker.status}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {statuses.map(s => (
+                                            <SelectItem key={s.value} value={s.value}>
+                                                {s.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.status} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="note">Catatan Operator</Label>
+                                <Textarea 
+                                    id="note"
+                                    placeholder="Tambahkan catatan tindak lanjut..."
+                                    value={data.note}
+                                    onChange={(e) => setData('note', e.target.value)}
+                                    rows={4}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="operatorNotes"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <FormLabel>Catatan Operator</FormLabel>
-                                        <FormControl>
-                                            <Textarea placeholder="Tambahkan catatan..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="submit" disabled={isPending} className="w-full">
-                                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                    Simpan Perubahan
-                                </Button>
-                            </form>
-                        </Form>
+                                <InputError message={errors.note} />
+                            </div>
+
+
+                            <Button type="submit" disabled={isPending} className="w-full">
+                                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                Simpan Perubahan
+                            </Button>
+                        </form>
                     </div>
                 </SheetContent>
                 </Sheet>

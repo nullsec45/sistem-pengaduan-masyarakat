@@ -241,4 +241,26 @@ class ReportController extends Controller
 
         return redirect()->route('dashboard.reports.index')->with('success', 'Laporan berhasil diubah.');
     }
+
+    public function updateStatus(ReportRequest $request, String $id)
+    {
+        try {
+            $report = Report::findOrFail($id);
+            $report->tracker->status = $request->status;
+            $report->tracker->note = $request->note;
+            $report->tracker->save();
+
+            return redirect()->route('dashboard.reports.index')->with('success', 'Laporan berhasil diverifikasi.');
+        } catch (\Throwable $err) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' =>   $err->getMessage()
+                ]);
+        }
+
+
+        return redirect()->route('dashboard.reports.index')->with('success', 'Status laporan berhasil diperbarui.');
+    }
 }
