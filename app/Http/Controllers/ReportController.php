@@ -18,7 +18,27 @@ class ReportController extends Controller
 {
     public function dashboard()
     {
-        return Inertia::render('Dashboard');
+        $usersCount = \App\Models\User::count();
+        $reportsCount = \App\Models\Report::count();
+
+        $monthlyReports = \App\Models\Report::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, category_id, COUNT(*) as count')
+            ->with('category')
+            ->groupBy('year', 'month', 'category_id')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+
+        $categoryReports = \App\Models\Report::selectRaw('category_id, COUNT(*) as count')
+            ->with('category')
+            ->groupBy('category_id')
+            ->get();
+
+        return Inertia::render('Dashboard', [
+            'usersCount' => $usersCount,
+            'reportsCount' => $reportsCount,
+            'monthlyReports' => $monthlyReports,
+            'categoryReports' => $categoryReports,
+        ]);
     }
 
     public function index()
@@ -157,6 +177,14 @@ class ReportController extends Controller
         $path = 'uploads/reports';
         $fileName = null;
 
+        if (Auth::user()->email !== Report::find($id)->reporter->email) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' =>   'Anda tidak memiliki akses untuk mengubah laporan ini.'
+                ]);
+        }
+
         try {
             $reporter = Reporter::updateOrCreate(
                 [
@@ -190,7 +218,6 @@ class ReportController extends Controller
             $data = $request->validated();
             $data['reporter_id'] = $reporter->id;
             $data['ticket_id'] = $ticketId;
-            // Report::where('id', $id)->update($data);
             $report = Report::find($id);
             $report->update($data);
 
@@ -244,13 +271,17 @@ class ReportController extends Controller
 
     public function updateStatus(ReportRequest $request, String $id)
     {
+        DB::beginTransaction();
+
         try {
             $report = Report::findOrFail($id);
             $report->tracker->status = $request->status;
             $report->tracker->note = $request->note;
             $report->tracker->save();
 
-            return redirect()->route('dashboard.reports.index')->with('success', 'Laporan berhasil diverifikasi.');
+            DB::commit();
+
+            return back()->with('success', 'Laporan berhasil diverifikasi.');
         } catch (\Throwable $err) {
 
             return back()
@@ -259,8 +290,38 @@ class ReportController extends Controller
                     'error' =>   $err->getMessage()
                 ]);
         }
+    }
 
+    public function destroy(String $id)
+    {
+        DB::beginTransaction();
 
-        return redirect()->route('dashboard.reports.index')->with('success', 'Status laporan berhasil diperbarui.');
+        try {
+            $report = Report::findOrFail($id);
+
+            if (Auth::user()->email !== $report->reporter->email) {
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'error' =>   'Anda tidak memiliki akses untuk menghapus laporan ini.'
+                    ]);
+            }
+
+            $this->helper->fileDeleteHandling($report->media->first()?->path, $report->media->first()?->file_name);
+
+            $report->delete();
+
+            DB::commit();
+
+            return redirect()->route('dashboard.reports.index')->with('success', 'Laporan berhasil dihapus.');
+        } catch (\Throwable $err) {
+            DB::rollBack();
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' =>   $err->getMessage()
+                ]);
+        }
     }
 }
