@@ -43,9 +43,10 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
 
-        Route::get('/', [ReportController::class, 'dashboard'])->name('index');
 
-        Route::controller(UserController::class)
+        Route::get('/', [ReportController::class, 'dashboard'])->middleware(['role:ADMIN'])->name('index');
+
+        Route::middleware('role:ADMIN')->controller(UserController::class)
             ->prefix('users')
             ->name('users.')
             ->group(function () {
@@ -60,13 +61,21 @@ Route::middleware('auth')->group(function () {
             ->prefix('reports')
             ->name('reports.')
             ->group(function () {
+
                 Route::get('/', 'index')->name('index');
-                Route::get('/create', 'create')->name('create');
-                Route::post('/store', 'store')->name('store');
                 Route::get('/{id}/show', 'show')->name('show');
-                Route::get('/{id}/edit', 'edit')->name('edit');
-                Route::put('/{id}', 'update')->name('update');
-                Route::put('/update-status/{id}', 'updateStatus')->name('update-status');
+
+                Route::middleware('role:USER')->group(function () {
+                    Route::get('/create', 'create')->name('create');
+                    Route::post('/store', 'store')->name('store');
+                    Route::get('/{id}/edit', 'edit')->name('edit');
+                    Route::put('/{id}', 'update')->name('update');
+                    Route::delete('/{id}', 'destroy')->name('destroy');
+                });
+
+                Route::put('/update-status/{id}', 'updateStatus')
+                    ->name('update-status')
+                    ->middleware('role:ADMIN');
             });
     });
 });
