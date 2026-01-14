@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasOne};
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Report extends Model
 {
@@ -54,6 +55,16 @@ class Report extends Model
                 ],
                 ['status' => 'Pending']
             );
+        });
+
+        static::deleting(function ($report) {
+            DB::transaction(function () use ($report) {
+                // Hapus media terkait (morphMany)
+                $report->media()->delete();
+
+                // Hapus tracker terkait (hasOne)
+                $report->tracker()->delete();
+            });
         });
     }
 }
