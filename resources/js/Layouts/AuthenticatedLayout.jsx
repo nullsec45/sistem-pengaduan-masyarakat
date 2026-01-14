@@ -30,8 +30,8 @@ export default function AuthenticatedLayout({ user, children }) {
     const { url } = usePage();
 
     const navItems = [
-        { href: "/dashboard", icon: Home, label: "Dashboard" },
         ...(user.role === 'ADMIN' ? [
+            { href: "/dashboard", icon: Home, label: "Dashboard" },
             { href: "/dashboard/users", icon: Users, label: "Daftar Pengguna" }
         ] : []),
         { href: "/dashboard/reports", icon: FileText, label: "Daftar Aduan" },
