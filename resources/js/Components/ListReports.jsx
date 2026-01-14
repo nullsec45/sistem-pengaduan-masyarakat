@@ -7,10 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useForm, Link } from '@inertiajs/react';
+import { useForm, Link, usePage } from '@inertiajs/react';
 import { Badge } from "@/components/ui/badge";
-import { useState, useTransition } from "react";
-// import VerificationValidate from "@/Validation/VerificationValidate";
+import { useState, useTransition, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -20,12 +19,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// import { useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from '@/components/ui/textarea';
 import { Pencil, Trash, FileText } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import InputError from "@/Components/InputError"; 
+import InputError from "@/Components/InputError";
+import Swal from 'sweetalert2'; 
 
 
 const getStatusColor = (status) => {
@@ -52,21 +50,34 @@ const statuses = [
 ];
 
 export default function ListReport({ reports, action, user, home }) {
+    const { flash } = usePage().props;
+    
+    useEffect(() => {
+        if (flash.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: flash.success,
+                timer: 3000,
+                showConfirmButton: false
+            });
+        }
+        if (flash.error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: flash.error,
+                timer: 3000,
+                showConfirmButton: false
+            });
+        }
+    }, [flash]);
+
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [selectedReport, setSelectedReport] = useState(null);
-    // const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
 
-    // const form = useForm({
-    //     resolver: zodResolver(VerificationValidate),
-    //     defaultValues: {
-    //         status: '',
-    //         operatorNotes: '',
-    //     },
-    // });
-
-
-     const { data, setData, put, processing, errors, reset } = useForm({
+    const { data, setData, put, processing, errors, reset } = useForm({
         status:'',
         note:'',
     });
